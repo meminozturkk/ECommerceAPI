@@ -1,4 +1,6 @@
 ﻿using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Application.ViewModels.Products;
+using ECommerceAPI.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,16 +19,45 @@ namespace ECommerceAPI.API.Controllers
             _productrepositoryWrite = productrepositoryWrite;
         }
         [HttpGet]
-        public async Task Get()
+        public async Task<IActionResult> Get()
         {
-           await _productrepositoryWrite.AddRangeAsync(new()
+
+            return Ok(_productrepositoryRead.GetAll(false));
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult>GetById(string id)
+        {
+            return Ok(await _productrepositoryRead.GetByIdAsync(id, false));
+        }
+        [HttpPost]
+        public async Task<IActionResult> Post(VM_Create_Product model)
+        {
+            await _productrepositoryWrite.AddAsync(new()
             {
-                new() { Id= Guid.NewGuid(), Name="Product 1" , CreatedDate = DateTime.UtcNow, Price = 100, Stock = 10 },
-                new() { Id= Guid.NewGuid(), Name="Product 2" , CreatedDate = DateTime.UtcNow, Price = 110, Stock = 10 },
-                new() { Id= Guid.NewGuid(), Name="Product 3" , CreatedDate = DateTime.UtcNow, Price = 120, Stock = 10 }
+                Name = model.Name,
+                Stock = model.Stock,
+                Price = model.Price,
             });
             await _productrepositoryWrite.SaveAsync();
+            return Ok();
         }
+        [HttpPut]
+        public async Task<IActionResult> Put(VM_Update_Product model)
+        {
+            Product product = await _productrepositoryRead.GetByIdAsync(model.Id);
+            product.Stock = model.Stock;
+            product.Price = model.Price;
+            product.Name = model.Name;
+            await _productrepositoryWrite.SaveAsync();
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            await _productrepositoryWrite.DeleteAsync(id);
+            await _productrepositoryWrite.SaveAsync();
 
+            return Ok();
+        }
     }
 }
