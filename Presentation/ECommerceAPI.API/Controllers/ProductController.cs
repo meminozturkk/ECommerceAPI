@@ -22,7 +22,15 @@ namespace ECommerceAPI.API.Controllers
         public async Task<IActionResult> Get()
         {
 
-            return Ok(_productrepositoryRead.GetAll(false));
+            return Ok( _productrepositoryRead.GetAll(false).Select(p=> new
+            {
+                p.Id,
+                p.Name,
+                p.Stock,
+                p.Price,
+                p.CreatedDate,
+                p.UpdatedDate
+            }));
         }
         [HttpGet("{id}")]
         public async Task<IActionResult>GetById(string id)
@@ -32,6 +40,9 @@ namespace ECommerceAPI.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(VM_Create_Product model)
         {
+            if(ModelState.IsValid) {
+               
+            }
             await _productrepositoryWrite.AddAsync(new()
             {
                 Name = model.Name,

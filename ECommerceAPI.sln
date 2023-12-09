@@ -5,19 +5,24 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{E51BE2D3-E2AD-4FE7-8E3B-654538EC6E6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerceAPI.Domain", "Core\ECommerceAPI.Domain\ECommerceAPI.Domain.csproj", "{360BACCB-E120-46A4-9BDD-B826CFAF92EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerceAPI.Domain", "Core\ECommerceAPI.Domain\ECommerceAPI.Domain.csproj", "{360BACCB-E120-46A4-9BDD-B826CFAF92EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerceAPI.Application", "Core\ECommerceAPI.Application\ECommerceAPI.Application.csproj", "{69E3F71E-444B-4659-B0F4-7FA76C500F96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerceAPI.Application", "Core\ECommerceAPI.Application\ECommerceAPI.Application.csproj", "{69E3F71E-444B-4659-B0F4-7FA76C500F96}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{AEE508C0-EC2D-4A79-AEDC-BAAC7F33CBB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerceAPI.Infrastructure", "Infrastructure\ECommerceAPI.Infrastructure\ECommerceAPI.Infrastructure.csproj", "{BD4AAAD3-9029-4301-804D-9DBB7389922B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerceAPI.Infrastructure", "Infrastructure\ECommerceAPI.Infrastructure\ECommerceAPI.Infrastructure.csproj", "{BD4AAAD3-9029-4301-804D-9DBB7389922B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerceAPI.Persistence", "Infrastructure\ECommerceAPI.Persistence\ECommerceAPI.Persistence.csproj", "{56411F1D-6668-458B-AB0B-91B5944246B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerceAPI.Persistence", "Infrastructure\ECommerceAPI.Persistence\ECommerceAPI.Persistence.csproj", "{56411F1D-6668-458B-AB0B-91B5944246B0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{9617CD7A-72F5-4FD6-8943-AB7DAC073520}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerceAPI.API", "Presentation\ECommerceAPI.API\ECommerceAPI.API.csproj", "{85EF4D4B-36C2-434E-8436-9B82A00D31EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerceAPI.API", "Presentation\ECommerceAPI.API\ECommerceAPI.API.csproj", "{85EF4D4B-36C2-434E-8436-9B82A00D31EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{34787272-6B6F-41FD-83F7-6883490753BE}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
