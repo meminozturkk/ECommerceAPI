@@ -8,6 +8,7 @@ using ECommerceAPI.Application.Repositories.InvoiceFile;
 using ECommerceAPI.Persistence.Contexts;
 
 namespace ECommerceAPI.Persistence.Repositories
+{ 
     public class InvoiceFileReadRepository : ReadRepository<P.InvoiceFile>, IInvoiceFileReadRepository
 {
     public InvoiceFileReadRepository(ECommerceAPIDbContext context) : base(context)

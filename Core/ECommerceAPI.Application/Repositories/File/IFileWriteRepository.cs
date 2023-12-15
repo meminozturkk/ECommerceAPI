@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Repositories
 {
-    public interface IFileWriteRepository:IReadRepository<ECommerceAPI.Domain.Entities.File>
+    public interface IFileWriteRepository:IWriteRepository<ECommerceAPI.Domain.Entities.File>
     {
     }
 }
