@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ECommerceAPI.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class mig_1 : Migration
+    public partial class _1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,6 +23,23 @@ namespace ECommerceAPI.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    Path = table.Column<string>(type: "text", nullable: false),
+                    Storage = table.Column<string>(type: "text", nullable: false),
+                    Discriminator = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,6 +81,30 @@ namespace ECommerceAPI.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductProductImageFile",
+                columns: table => new
+                {
+                    ProductImageFilesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductsId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductProductImageFile", x => new { x.ProductImageFilesId, x.ProductsId });
+                    table.ForeignKey(
+                        name: "FK_ProductProductImageFile_Files_ProductImageFilesId",
+                        column: x => x.ProductImageFilesId,
+                        principalTable: "Files",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductProductImageFile_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderProduct",
                 columns: table => new
                 {
@@ -96,6 +137,11 @@ namespace ECommerceAPI.Persistence.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductProductImageFile_ProductsId",
+                table: "ProductProductImageFile",
+                column: "ProductsId");
         }
 
         /// <inheritdoc />
@@ -105,7 +151,13 @@ namespace ECommerceAPI.Persistence.Migrations
                 name: "OrderProduct");
 
             migrationBuilder.DropTable(
+                name: "ProductProductImageFile");
+
+            migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Files");
 
             migrationBuilder.DropTable(
                 name: "Products");

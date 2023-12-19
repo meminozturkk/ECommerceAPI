@@ -12,7 +12,7 @@ namespace ECommerceAPI.Infrastructure.Services
             _webHostEnvironment = webHostEnvironment;
         }
 
-        private async Task<string> FileRenameAsync(string path, string fileName, bool first = true)
+        public async Task<string> FileRenameAsync(string path, string fileName, bool first = true)
         {
 
             string extension = Path.GetExtension(fileName);

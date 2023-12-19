@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerceAPI.Infrastructure.Storage.Local
+namespace ECommerceAPI.Infrastructure.Services.Storage.Local
 {
-    public class LocalStorage : ILocalStorage
+    public class LocalStorage : Storage, ILocalStorage
     {
         IWebHostEnvironment _webHostEnvironment;
 
@@ -18,7 +18,7 @@ namespace ECommerceAPI.Infrastructure.Storage.Local
         {
             _webHostEnvironment = webHostEnvironment;
         }
-        public async Task DeleteAsync(string path, IFormFileCollection fileName)
+        public async Task DeleteAsync(string path, string fileName)
             => File.Delete($"{path}\\{fileName}");
 
         public List<string> GetFiles(string path)
@@ -30,7 +30,7 @@ namespace ECommerceAPI.Infrastructure.Storage.Local
         public bool HasFile(string path, string fileName)
             => File.Exists($"{path}\\{fileName}");
 
-        public async Task<List<(string fileName, string)>> UploadAsync(string path, IFormFileCollection files)
+        public async Task<List<(string fileName, string pathOrContainerName)>> UploadAsync(string path, IFormFileCollection files)
         {
             string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, path);
             if (!Directory.Exists(uploadPath))
@@ -42,14 +42,14 @@ namespace ECommerceAPI.Infrastructure.Storage.Local
             List<bool> results = new();
             foreach (IFormFile file in files)
             {
-                //string fileNewName = await FileRenameAsync(uploadPath, file.FileName);
+                string fileNewName = await FileRenameAsync(uploadPath, file.Name, HasFile);
 
-                await CopyFileAsync($"{path}\\{file.Name}", file);
-                datas.Add((file.Name, $"{uploadPath}\\{file.Name}"));
-                
+                await CopyFileAsync($"{uploadPath}\\{fileNewName}", file);
+                datas.Add((file.Name, $"{path}\\{fileNewName}"));
+
             }
-            
-      
+
+
             return datas;
         }
         public async Task<bool> CopyFileAsync(string path, IFormFile file)
@@ -69,4 +69,4 @@ namespace ECommerceAPI.Infrastructure.Storage.Local
 
         }
     }
-} 
+}

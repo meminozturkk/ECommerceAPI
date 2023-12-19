@@ -4,10 +4,11 @@ using ECommerceAPI.Application.RequestParameters;
 using ECommerceAPI.Application.Services;
 using ECommerceAPI.Application.ViewModels.Products;
 using ECommerceAPI.Domain.Entities;
+using ECommerceAPI.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
-using System.Security.Cryptography.Xml;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceAPI.API.Controllers
 {
@@ -21,14 +22,19 @@ namespace ECommerceAPI.API.Controllers
         readonly private IWebHostEnvironment _webHostEnvironment;
         readonly private IFileService _fileservice;
         readonly IStorageService _storageService;
+        readonly IProductImageFileWriteRepository _productimagefilewriterepository;
+        readonly IConfiguration configuration;
 
-        public ProductController(IProductWriteRepository productrepositoryWrite, IProductReadRepository productrepositoryRead, IWebHostEnvironment webHostEnvironment, IFileService fileservice = null, IStorageService storageService = null)
+        public ProductController(IProductWriteRepository productrepositoryWrite, IProductReadRepository productrepositoryRead,
+            IWebHostEnvironment webHostEnvironment, IStorageService storageService, IProductImageFileWriteRepository productimagefilewriterepository, IConfiguration configuration)
         {
             _productrepositoryWrite = productrepositoryWrite;
             _productrepositoryRead = productrepositoryRead;
             _webHostEnvironment = webHostEnvironment;
-            _fileservice = fileservice;
+
             _storageService = storageService;
+            _productimagefilewriterepository = productimagefilewriterepository;
+            this.configuration = configuration;
         }
 
 
@@ -90,10 +96,44 @@ namespace ECommerceAPI.API.Controllers
             return Ok();
         }
         [HttpPost("[action]")]
-        public async Task<IActionResult> Upload()
+        public async Task<IActionResult> Upload(string id)
         {
-           var datas =await  _storageService.UploadAsync("resoruce/product-images", Request.Form.Files);
+            List<(string fileName, string pathOrContainerName)> data= await _storageService.UploadAsync("photo-images", Request.Form.Files);
+            Product product = await _productrepositoryRead.GetByIdAsync(id);
 
+            var images = data.Select(x => new ProductImageFile
+            {
+                FileName = x.fileName,
+                Path = x.pathOrContainerName,
+                Storage = _storageService.StorageName,
+                Products = new List<Product>() { product }
+            }).ToList();
+            await _productimagefilewriterepository.AddRangeAsync(images);
+            await _productimagefilewriterepository.SaveAsync();
+            return Ok();
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> GetProductImages(string id)
+        {
+            Product? product = await _productrepositoryRead.Table.Include(p => p.ProductImageFile)
+                    .FirstOrDefaultAsync(p => p.Id == Guid.Parse(id));
+            return Ok(product.ProductImageFile.Select(p => new
+            {
+                Path = $"{configuration["BaseStorageUrl"]}/{p.Path}",
+                p.FileName,
+                p.Id
+            }));
+        }
+        [HttpDelete("[action]/{id}")]
+        public async Task<IActionResult> DeleteProductImage(string id, string imageId)
+        {
+            Product? product = await _productrepositoryRead.Table.Include(p => p.ProductImageFile)
+                  .FirstOrDefaultAsync(p => p.Id == Guid.Parse(id));
+
+            ProductImageFile productImageFile = product.ProductImageFile.FirstOrDefault(p => p.Id == Guid.Parse(imageId));
+            product.ProductImageFile.Remove(productImageFile);
+            await _productrepositoryWrite.SaveAsync();
             return Ok();
         }
     }
