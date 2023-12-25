@@ -1,7 +1,6 @@
 ﻿using ECommerceAPI.Application.Abstraction.Services;
 using ECommerceAPI.Application.Abstraction.Token;
 using ECommerceAPI.Application.DTOs;
-using Google.Apis.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
