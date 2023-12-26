@@ -31,11 +31,13 @@ namespace ECommerceAPI.API.Controllers
 
       
         readonly IMediator _mediator;
+        readonly ILogger<ProductController> _logger;
 
-        public ProductController( IMediator mediator)
+        public ProductController( IMediator mediator, ILogger<ProductController> logger)
         {
            
             _mediator = mediator;
+            _logger = logger;
         }
 
 
@@ -44,6 +46,7 @@ namespace ECommerceAPI.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllProductQueryRequest getAllProductQueryRequest)
         {
+            _logger.LogInformation("asmdlasmdlamsd");
             GetAllProductQueryResponse response = await _mediator.Send(getAllProductQueryRequest);
             return Ok(response);
         }
