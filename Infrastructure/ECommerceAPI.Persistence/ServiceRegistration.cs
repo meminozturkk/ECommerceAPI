@@ -1,10 +1,5 @@
 ﻿using ECommerceAPI.Persistence.Contexts;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ECommerceAPI.Application.Repositories;
 using ECommerceAPI.Persistence.Repositories;
@@ -13,6 +8,10 @@ using ECommerceAPI.Domain.Entities.Identity;
 using ECommerceAPI.Application.Abstraction.Services.Authentications;
 using ECommerceAPI.Application.Abstraction.Services;
 using ECommerceAPI.Persistence.Services;
+using ECommerceAPI.Application.Repositories.Basket;
+using ECommerceAPI.Application.Repositories.BasketItem;
+using ECommerceAPI.Persistence.Repositories.Basket;
+using ECommerceAPI.Persistence.Repositories.BasketItem;
 
 namespace ECommerceAPI.Persistence
 {
@@ -53,6 +52,11 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<IExternalAuthentication, AuthService>();
             services.AddScoped<IInternalAuthentication, AuthService>();
 
+            services.AddScoped<IBasketItemReadRepository, BasketItemReadRepository>();
+            services.AddScoped<IBasketItemWriteRepository, BasketItemWriteRepository>();
+            services.AddScoped<IBasketReadRepository, BasketReadRepository>();
+            services.AddScoped<IBasketWriteRepository, BasketWriteRepository>();
+            services.AddScoped<IBasketService, BasketService>();
 
         }
     }
