@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerceAPI.Persistence.Migrations
 {
     [DbContext(typeof(ECommerceAPIDbContext))]
-    [Migration("20240123161453_6")]
-    partial class _6
+    [Migration("20240220161148_1")]
+    partial class _1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,7 +238,7 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Adress")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -252,12 +252,19 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("OrderCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderCode")
+                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -275,6 +282,9 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uuid");
+
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
@@ -285,6 +295,8 @@ namespace ECommerceAPI.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Products");
                 });
@@ -395,21 +407,6 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.Property<Guid>("OrdersId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProductsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("OrdersId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("OrderProduct");
-                });
-
             modelBuilder.Entity("ProductProductImageFile", b =>
                 {
                     b.Property<Guid>("ProductImageFileId")
@@ -478,7 +475,7 @@ namespace ECommerceAPI.Persistence.Migrations
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
                 {
                     b.HasOne("ECommerceAPI.Domain.Entities.Customer", "Customer")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -492,6 +489,13 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.Navigation("Basket");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Product", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Order", null)
+                        .WithMany("Products")
+                        .HasForeignKey("OrderId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -545,21 +549,6 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.HasOne("ECommerceAPI.Domain.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ECommerceAPI.Domain.Entities.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ProductProductImageFile", b =>
                 {
                     b.HasOne("ECommerceAPI.Domain.Entities.ProductImageFile", null)
@@ -583,14 +572,14 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Customer", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("Baskets");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Product", b =>
