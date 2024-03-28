@@ -20,6 +20,7 @@ using Serilog.Context;
 using ECommerceAPI.API.Extensions;
 using Microsoft.AspNetCore.Builder;
 using ECommerceApi.SignalR;
+using ECommerceAPI.API.Filter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,7 +67,11 @@ builder.Services.AddHttpLogging(logging =>
     logging.ResponseBodyLogLimit = 4096;
 });
 
-builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>())
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+    options.Filters.Add<RolePermissionFilter>();
+})
     .AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
     .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 
