@@ -25,6 +25,8 @@ using ECommerceAPI.Application.Features.Commands.ProductImageFile.ChangeShowcase
 using ECommerceAPI.Application.Consts;
 using ECommerceAPI.Application.CustomAttributes;
 using ECommerceAPI.Application.Enums;
+using ECommerceAPI.Application.Abstraction.Services;
+using ECommerceAPI.Application.Features.Commands.Product.UpdateStockQrCodeToProduct;
 
 namespace ECommerceAPI.API.Controllers
 {
@@ -36,16 +38,24 @@ namespace ECommerceAPI.API.Controllers
       
         readonly IMediator _mediator;
         readonly ILogger<ProductController> _logger;
+        readonly IProductService _productService;
 
-        public ProductController( IMediator mediator, ILogger<ProductController> logger)
+
+        public ProductController(IMediator mediator, ILogger<ProductController> logger, IProductService productService)
         {
-           
+
             _mediator = mediator;
             _logger = logger;
+            _productService = productService;
         }
 
 
-
+        [HttpPut("qrcode")]
+        public async Task<IActionResult> UpdateStockQrCodeToProduct(UpdateStockQrCodeToProductCommandRequest updateStockQrCodeToProductCommandRequest)
+        {
+            UpdateStockQrCodeToProductCommandResponse response = await _mediator.Send(updateStockQrCodeToProductCommandRequest);
+            return Ok(response);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetAllProductQueryRequest getAllProductQueryRequest)
@@ -53,6 +63,12 @@ namespace ECommerceAPI.API.Controllers
             _logger.LogInformation("asmdlasmdlamsd");
             GetAllProductQueryResponse response = await _mediator.Send(getAllProductQueryRequest);
             return Ok(response);
+        }
+        [HttpGet("qrcode/{productId}")]
+        public async Task<IActionResult> GetQrCodeToProduct([FromRoute] string productId)
+        {
+            var data = await _productService.QrCodeToProductAsync(productId);
+            return File(data, "image/png");
         }
 
         [HttpGet("{Id}")]
@@ -62,6 +78,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Admin")]
         [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Writing, Definition = "Create Product")]
