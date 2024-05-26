@@ -27,6 +27,7 @@ using ECommerceAPI.Application.CustomAttributes;
 using ECommerceAPI.Application.Enums;
 using ECommerceAPI.Application.Abstraction.Services;
 using ECommerceAPI.Application.Features.Commands.Product.UpdateStockQrCodeToProduct;
+using ECommerceAPI.Application.Features.Queries.Product.GetProductSales;
 
 namespace ECommerceAPI.API.Controllers
 {
@@ -51,6 +52,7 @@ namespace ECommerceAPI.API.Controllers
 
 
         [HttpPut("qrcode")]
+        [Authorize(AuthenticationSchemes = "Admin")]
         public async Task<IActionResult> UpdateStockQrCodeToProduct(UpdateStockQrCodeToProductCommandRequest updateStockQrCodeToProductCommandRequest)
         {
             UpdateStockQrCodeToProductCommandResponse response = await _mediator.Send(updateStockQrCodeToProductCommandRequest);
@@ -65,6 +67,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
         [HttpGet("qrcode/{productId}")]
+        [Authorize(AuthenticationSchemes = "Admin")]
         public async Task<IActionResult> GetQrCodeToProduct([FromRoute] string productId)
         {
             var data = await _productService.QrCodeToProductAsync(productId);
@@ -72,6 +75,7 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpGet("{Id}")]
+        [Authorize(AuthenticationSchemes = "Admin")]
         public async Task<IActionResult> GetById([FromRoute] GetByIdProductQueryRequest getByIdProductQueryRequest)
         {
            GetByIdProductQueryResponse response =  await _mediator.Send(getByIdProductQueryRequest);
@@ -147,6 +151,14 @@ namespace ECommerceAPI.API.Controllers
         public async Task<IActionResult> ChangeShowcaseImage([FromQuery] ChangeShowcaseImageCommandRequest changeShowcaseImageCommandRequest)
         {
             ChangeShowcaseImageCommandResponse response = await _mediator.Send(changeShowcaseImageCommandRequest);
+            return Ok(response);
+        }
+        [HttpGet("[action]")]
+        [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Updating, Definition = "Get All Selles")]
+        public async Task<IActionResult> GetProductSales([FromQuery] GetProductSalesRequest getProductSalesRequest)
+        {
+            GetProductSalesResponse response = await _mediator.Send(getProductSalesRequest);
             return Ok(response);
         }
     }

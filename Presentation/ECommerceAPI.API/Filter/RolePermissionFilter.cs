@@ -20,24 +20,33 @@ namespace ECommerceAPI.API.Filter
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var name = context.HttpContext.User.Identity?.Name;
+
             if (!string.IsNullOrEmpty(name) && name != "180101051m@gmail.com")
             {
                 var descriptor = context.ActionDescriptor as ControllerActionDescriptor;
-                var attribute = descriptor.MethodInfo.GetCustomAttribute(typeof(AuthorizeDefinitionAttribute)) as AuthorizeDefinitionAttribute;
 
-                var httpAttribute = descriptor.MethodInfo.GetCustomAttribute(typeof(HttpMethodAttribute)) as HttpMethodAttribute;
+                if (descriptor != null)
+                {
+                    var attribute = descriptor.MethodInfo.GetCustomAttribute(typeof(AuthorizeDefinitionAttribute)) as AuthorizeDefinitionAttribute;
 
-                var code = $"{(httpAttribute != null ? httpAttribute.HttpMethods.First() : HttpMethods.Get)}.{attribute.ActionType}.{attribute.Definition.Replace(" ", "")}";
+                    if (attribute != null)
+                    {
+                        var httpAttribute = descriptor.MethodInfo.GetCustomAttribute(typeof(HttpMethodAttribute)) as HttpMethodAttribute;
 
-                var hasRole = await _userService.HasRolePermissionToEndpointAsync(name, code);
+                        var code = $"{(httpAttribute != null ? httpAttribute.HttpMethods.First() : HttpMethods.Get)}.{attribute.ActionType}.{attribute.Definition.Replace(" ", "")}";
 
-                if (!hasRole)
-                    context.Result = new UnauthorizedResult();
-                else
-                    await next();
+                        var hasRole = await _userService.HasRolePermissionToEndpointAsync(name, code);
+
+                        if (!hasRole)
+                        {
+                            context.Result = new UnauthorizedResult();
+                            return;
+                        }
+                    }
+                }
             }
-            else
-                await next();
+
+            await next();
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using ECommerceAPI.Application.Consts;
 using ECommerceAPI.Application.CustomAttributes;
 using ECommerceAPI.Application.Enums;
-using ECommerceAPI.Application.Features.Commands.Order;
 using ECommerceAPI.Application.Features.Commands.Order.CompleteOrder;
+using ECommerceAPI.Application.Features.Commands.Order.CreateOrder;
+using ECommerceAPI.Application.Features.Commands.Order.DeleteOrder;
+using ECommerceAPI.Application.Features.Commands.Product.RemoveProduct;
 using ECommerceAPI.Application.Features.Queries.Order.GetAllOrders;
 using ECommerceAPI.Application.Features.Queries.Order.GetOrderById;
 using MediatR;
@@ -60,5 +62,15 @@ namespace ECommerceAPI.API.Controllers
             CompleteOrderCommandResponse response = await _mediator.Send(completeOrderCommandRequest);
             return Ok(response);
         }
+        [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Deleting, Definition = "Delete Product")]
+
+        public async Task<IActionResult> Delete([FromRoute] DeleteOrderCommandRequest deleteOrderCommandRequest)
+        {
+            DeleteOrderCommandResponse response = await _mediator.Send(deleteOrderCommandRequest);
+            return Ok();
+        }
     }
+    
 }

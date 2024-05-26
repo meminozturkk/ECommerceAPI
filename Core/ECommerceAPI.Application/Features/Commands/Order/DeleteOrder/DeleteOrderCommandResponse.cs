@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerceAPI.Application.Features.Commands.Order
+namespace ECommerceAPI.Application.Features.Commands.Order.DeleteOrder
 {
-    public class CreateOrderCommandResponse
+    public class DeleteOrderCommandResponse
     {
     }
 }

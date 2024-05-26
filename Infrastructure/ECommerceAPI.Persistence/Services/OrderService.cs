@@ -14,13 +14,14 @@ namespace ECommerceAPI.Persistence.Services
         readonly IOrderReadRepository _orderReadRepository;
         readonly ICompletedOrderWriteRepository _completedOrderWriteRepository;
         readonly ICompletedOrderReadRepository _completedOrderReadRepository;
-
-        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository, ICompletedOrderWriteRepository completedOrderWriteRepository, ICompletedOrderReadRepository completedOrderReadRepository)
+        readonly IProductWriteRepository _productWriteRepository;
+        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository, ICompletedOrderWriteRepository completedOrderWriteRepository, ICompletedOrderReadRepository completedOrderReadRepository, IProductWriteRepository productWriteRepository)
         {
             _orderWriteRepository = orderWriteRepository;
             _orderReadRepository = orderReadRepository;
             _completedOrderWriteRepository = completedOrderWriteRepository;
             _completedOrderReadRepository = completedOrderReadRepository;
+            _productWriteRepository = productWriteRepository;
         }
 
         public async Task CreateOrderAsync(CreateOrder createOrder)
@@ -114,21 +115,46 @@ namespace ECommerceAPI.Persistence.Services
         }
         public async Task<(bool, CompletedOrderDTO)> CompleteOrderAsync(string id)
         {
-            Order? order = await _orderReadRepository.Table.Include(o => o.Basket)
-                .ThenInclude(b => b.User)
-                .FirstOrDefaultAsync(o => o.Id == Guid.Parse(id));
+            Order? order = await _orderReadRepository.Table
+         .Include(o => o.Basket)
+             .ThenInclude(b => b.BasketItems)
+                 .ThenInclude(bi => bi.Product)
+         .Include(o => o.Basket)
+             .ThenInclude(b => b.User)
+         .FirstOrDefaultAsync(o => o.Id == Guid.Parse(id));
+
             if (order != null)
             {
-                await _completedOrderWriteRepository.AddAsync(new() { OrderId = Guid.Parse(id) });
-                return (await _completedOrderWriteRepository.SaveAsync() > 0, new()
+                foreach (var basketItem in order.Basket.BasketItems)
                 {
-                    OrderCode = order.OrderCode,
-                    OrderDate = order.CreatedDate,
-                    Username = order.Basket.User.UserName,
-                    EMail = order.Basket.User.Email
-                });
+                    var product = basketItem.Product;
+                    if (product != null)
+                    {
+                        product.Stock -= basketItem.Quantity;
+                        _productWriteRepository.Update(product);
+                    }
+                }
+
+                await _completedOrderWriteRepository.AddAsync(new() { OrderId = Guid.Parse(id) });
+
+                bool saveResult = await _completedOrderWriteRepository.SaveAsync() > 0;
+                bool productSaveResult = await _productWriteRepository.SaveAsync() > 0;
+
+                if (saveResult)
+                {
+                    return (true, new()
+                    {
+                        OrderCode = order.OrderCode,
+                        OrderDate = order.CreatedDate,
+                        Username = order.Basket.User.UserName,
+                        EMail = order.Basket.User.Email
+                    });
+                }
             }
+
             return (false, null);
         }
+
+       
     }
 }
