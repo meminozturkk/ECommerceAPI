@@ -26,7 +26,7 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetProductSales
             
                 var productSales = new Dictionary<Guid, int>();
 
-                // Order tablosundan, tamamlanmış olanları ve ilişkili ürünleri al
+                
                 var completedOrders = await _orderReadRepository.GetAll(false)
                     .Include(o => o.Basket)
                         .ThenInclude(b => b.BasketItems)
@@ -34,7 +34,7 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetProductSales
                     .Where(o => o.CompletedOrder != null)
                     .ToListAsync();
 
-                // Her bir order için, basket içerisindeki ürünleri ve miktarlarını alarak satış sayısını hesapla
+                
                 foreach (var order in completedOrders)
                 {
                     foreach (var basketItem in order.Basket.BasketItems)
@@ -53,12 +53,10 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetProductSales
                     }
                 }
 
-                // Ürün ID'leri ile adlarını eşleştirme
                 var productNames = await _productReadRepository.GetAll(false)
                     .Where(p => productSales.Keys.Contains(p.Id))
                     .ToDictionaryAsync(p => p.Id, p => p.Name);
 
-                // İsim ve satış miktarını içeren yeni bir sözlük oluşturma
                 var productSalesWithName = productSales
                     .OrderByDescending(ps => ps.Value)
                     .ToDictionary(ps => productNames[ps.Key], ps => ps.Value);

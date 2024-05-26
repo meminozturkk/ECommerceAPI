@@ -25,7 +25,8 @@ namespace ECommerceAPI.Persistence.Services
         readonly IBasketReadRepository _basketReadRepository;
         readonly IBasketItemWriteRepository _basketItemWriteRepository;
         readonly IBasketItemReadRepository _basketItemReadRepository;
-        public BasketService(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager, IOrderReadRepository orderReadRepository, IBasketWriteRepository basketWriteRepository, IBasketItemWriteRepository basketItemWriteRepository, IBasketItemReadRepository basketItemReadRepository, IBasketReadRepository basketReadRepository)
+        readonly IProductReadRepository _productReadRepository;
+        public BasketService(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager, IOrderReadRepository orderReadRepository, IBasketWriteRepository basketWriteRepository, IBasketItemWriteRepository basketItemWriteRepository, IBasketItemReadRepository basketItemReadRepository, IBasketReadRepository basketReadRepository, IProductReadRepository productReadRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
@@ -34,6 +35,7 @@ namespace ECommerceAPI.Persistence.Services
             _basketItemWriteRepository = basketItemWriteRepository;
             _basketItemReadRepository = basketItemReadRepository;
             _basketReadRepository = basketReadRepository;
+            _productReadRepository = productReadRepository;
         }
 
         private async Task<Basket?> ContextUser()
@@ -76,16 +78,49 @@ namespace ECommerceAPI.Persistence.Services
             if (basket != null)
             {
                 BasketItem _basketItem = await _basketItemReadRepository.GetSingleAsync(bi => bi.BasketId == basket.Id && bi.ProductId == Guid.Parse(basketItem.ProductId));
+                Product product = await _productReadRepository.GetByIdAsync(basketItem?.ProductId);
                 if (_basketItem != null)
-                    _basketItem.Quantity++;
-                else
-                    await _basketItemWriteRepository.AddAsync(new()
+                {
+                    
+                    if (product.Stock < basketItem.Quantity)
                     {
-                        BasketId = basket.Id,
-                        ProductId = Guid.Parse(basketItem.ProductId),
-                        Quantity = basketItem.Quantity
-                    });
+                        throw new Exception("Stok sayısından fazla sepete ürün eklenemez");
+                    }
+                    if (product.Stock > 0)
+                    {
+                        _basketItem.Quantity++;
+                        product.Stock--;
+                    }
+                    else
+                    {
+                        throw new Exception("Stok sayısından fazla sepete ürün eklenemez");
+                    }
 
+                }
+                else
+                {
+                    if (product.Stock < basketItem.Quantity)
+                    {
+                        throw new Exception("Stok sayısından fazla sepete ürün eklenemez");
+                    }
+                    if (product.Stock > 0)
+                    {
+                        await _basketItemWriteRepository.AddAsync(new()
+                        {
+                            BasketId = basket.Id,
+                            ProductId = Guid.Parse(basketItem.ProductId),
+                            Quantity = basketItem.Quantity
+                        });
+
+                       
+                        product.Stock--;
+                    }
+                    else
+                    {
+                        throw new Exception("Stok sayısından fazla sepete ürün eklenemez");
+                    }
+                   
+                }
                 await _basketItemWriteRepository.SaveAsync();
             }
         }
@@ -104,9 +139,12 @@ namespace ECommerceAPI.Persistence.Services
 
         public async Task RemoveBasketItemAsync(string basketItemId)
         {
+            
             BasketItem? basketItem = await _basketItemReadRepository.GetByIdAsync(basketItemId);
             if (basketItem != null)
             {
+                Product product = await _productReadRepository.GetByIdAsync(basketItem.ProductId.ToString());
+                product.Stock += basketItem.Quantity;
                 _basketItemWriteRepository.Delete(basketItem);
                 await _basketItemWriteRepository.SaveAsync();
             }
@@ -117,7 +155,14 @@ namespace ECommerceAPI.Persistence.Services
             BasketItem? _basketItem = await _basketItemReadRepository.GetByIdAsync(basketItem.BasketItemId);
             if (_basketItem != null)
             {
+                Product product = await _productReadRepository.GetByIdAsync(_basketItem.ProductId.ToString());
+                product.Stock -= basketItem.Quantity - _basketItem.Quantity;
                 _basketItem.Quantity = basketItem.Quantity;
+               
+                if (product.Stock < 0 || product.Stock < (_basketItem.Quantity - basketItem.Quantity) )
+                {
+                    throw new Exception("Stok sayısından fazla sepete ürün eklenemez");
+                }
                 await _basketItemWriteRepository.SaveAsync();
             }
         }

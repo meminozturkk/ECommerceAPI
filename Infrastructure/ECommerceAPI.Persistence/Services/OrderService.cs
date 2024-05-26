@@ -125,15 +125,15 @@ namespace ECommerceAPI.Persistence.Services
 
             if (order != null)
             {
-                foreach (var basketItem in order.Basket.BasketItems)
-                {
-                    var product = basketItem.Product;
-                    if (product != null)
-                    {
-                        product.Stock -= basketItem.Quantity;
-                        _productWriteRepository.Update(product);
-                    }
-                }
+                //foreach (var basketItem in order.Basket.BasketItems)
+                //{
+                //    var product = basketItem.Product;
+                //    if (product != null)
+                //    {
+                //        product.Stock -= basketItem.Quantity;
+                //        _productWriteRepository.Update(product);
+                //    }
+                //}
 
                 await _completedOrderWriteRepository.AddAsync(new() { OrderId = Guid.Parse(id) });
 

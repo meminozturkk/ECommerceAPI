@@ -129,7 +129,7 @@ namespace ECommerceAPI.Persistence.Services
                 await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, token.Expiration, 15);
                 return token;
             }
-            throw new AuthenticationErrorException();
+            throw new AuthenticationErrorException("Aman aman");
         }
 
         public async Task<Token> RefreshTokenLoginAsync(string refreshToken)

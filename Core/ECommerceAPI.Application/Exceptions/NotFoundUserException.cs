@@ -8,8 +8,9 @@ namespace ECommerceAPI.Application.Exceptions
 {
     public class NotFoundUserException : Exception
     {
-        public NotFoundUserException() : base("Wrong username or password")
+        public NotFoundUserException() : base("Kullanici adı ya da şifre yanlış")
         {
+           
         }
 
         public NotFoundUserException(string? message) : base(message)
