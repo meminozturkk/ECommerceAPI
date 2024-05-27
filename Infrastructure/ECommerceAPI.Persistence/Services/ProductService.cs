@@ -40,13 +40,23 @@ namespace ECommerceAPI.Persistence.Services
 
             return _qrCodeService.GenerateQRCode(plainText);
         }
-        public async Task StockUpdateToProductAsync(string productId, int stock)
+        public async Task StockUpdateToProductAsync(string productId, int? stock, string? name, float? price)
         {
             Product product = await _productReadRepository.GetByIdAsync(productId);
             if (product == null)
                 throw new Exception("Product not found");
-
-            product.Stock = stock;
+            if (stock != null)
+            {
+                product.Stock = (int)stock;
+            }
+           if (name != null)
+            {
+                product.Name = (string)name;
+            }
+            if (price != null)
+            {
+                product.Price = (float)price;
+            }
             await _productWriteRepository.SaveAsync();
         }
     }

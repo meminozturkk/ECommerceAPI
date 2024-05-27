@@ -9,7 +9,7 @@ namespace ECommerceAPI.Application.Abstraction.Services
     public interface IProductService
     {
         Task<byte[]> QrCodeToProductAsync(string productId);
-        Task StockUpdateToProductAsync(string productId, int stock);
+        Task StockUpdateToProductAsync(string productId, int? stock, string? name, float? price);
 
     }
 }

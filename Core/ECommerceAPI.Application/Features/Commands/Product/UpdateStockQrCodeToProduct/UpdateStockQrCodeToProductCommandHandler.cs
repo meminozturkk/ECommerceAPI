@@ -19,7 +19,7 @@ namespace ECommerceAPI.Application.Features.Commands.Product.UpdateStockQrCodeTo
 
         public async Task<UpdateStockQrCodeToProductCommandResponse> Handle(UpdateStockQrCodeToProductCommandRequest request, CancellationToken cancellationToken)
         {
-            await _productService.StockUpdateToProductAsync(request.ProductId, request.Stock);
+            await _productService.StockUpdateToProductAsync(request.ProductId, request.Stock, request.Name, request.Price);
             return new();
         }
     }

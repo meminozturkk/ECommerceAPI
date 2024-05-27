@@ -10,6 +10,8 @@ namespace ECommerceAPI.Application.Features.Commands.Product.UpdateStockQrCodeTo
     public class UpdateStockQrCodeToProductCommandRequest : IRequest<UpdateStockQrCodeToProductCommandResponse>
     {
         public string ProductId { get; set; }
-        public int Stock { get; set; }
+        public int? Stock { get; set; }
+        public string? Name { get; set; }
+        public float? Price { get; set; }
     }
 }
