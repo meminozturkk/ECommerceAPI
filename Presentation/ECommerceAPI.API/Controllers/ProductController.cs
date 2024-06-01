@@ -75,7 +75,6 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpGet("{Id}")]
-        [Authorize(AuthenticationSchemes = "Admin")]
         public async Task<IActionResult> GetById([FromRoute] GetByIdProductQueryRequest getByIdProductQueryRequest)
         {
            GetByIdProductQueryResponse response =  await _mediator.Send(getByIdProductQueryRequest);
@@ -126,8 +125,6 @@ namespace ECommerceAPI.API.Controllers
 
 
         [HttpGet("[action]/{id}")]
-        [Authorize(AuthenticationSchemes = "Admin")]
-        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Reading, Definition = "Get Products Images")]
         public async Task<IActionResult> GetProductImages([FromRoute] GetProductImagesQueryRequest getProductImagesQueryRequest)
         {
             List<GetProductImagesQueryResponse> responses =  await _mediator.Send(getProductImagesQueryRequest);
@@ -154,8 +151,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
         [HttpGet("[action]")]
-        [Authorize(AuthenticationSchemes = "Admin")]
-        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Updating, Definition = "Get All Selles")]
+      
         public async Task<IActionResult> GetProductSales([FromQuery] GetProductSalesRequest getProductSalesRequest)
         {
             GetProductSalesResponse response = await _mediator.Send(getProductSalesRequest);

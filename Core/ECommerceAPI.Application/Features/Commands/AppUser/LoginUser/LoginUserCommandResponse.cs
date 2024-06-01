@@ -13,6 +13,7 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.LoginUser
     public class LoginUserSuccessCommandResponse : LoginUserCommandResponse
     {
         public Token Token { get; set; }
+        public bool IsAdmin { get; set; }
     }
     public class LoginUserErrorCommandResponse : LoginUserCommandResponse
     {

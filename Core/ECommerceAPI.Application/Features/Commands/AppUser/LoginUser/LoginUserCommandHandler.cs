@@ -15,18 +15,23 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.LoginUser
     public class LoginUserCommandHandler : IRequestHandler<LoginUserCommandRequest, LoginUserCommandResponse>
     {
         readonly IAuthService _authService;
-        public LoginUserCommandHandler(IAuthService authService)
+        readonly IUserService _userService;
+        public LoginUserCommandHandler(IAuthService authService, IUserService userService)
         {
             _authService = authService;
+            _userService = userService;
+           
         }
 
         public async Task<LoginUserCommandResponse> Handle(LoginUserCommandRequest request, CancellationToken cancellationToken)
         {
             var token = await _authService.LoginAsync(request.UsernameOrEmail, request.Password, 900);
-         
+            var user = await _userService.GetByEMail(request.UsernameOrEmail);
+
                 return new LoginUserSuccessCommandResponse()
                 {
-                    Token = token
+                    Token = token,
+                    IsAdmin = user.IsAdmin
                 };
             
 

@@ -87,6 +87,17 @@ namespace ECommerceAPI.Persistence.Services
                 UserName = user.UserName
             }).ToList();
         }
+        public async Task<AppUser> GetByEMail(string emailOrName)
+        {
+            var user = await _userManager.FindByEmailAsync(emailOrName);
+            user??= await _userManager.FindByNameAsync(emailOrName);
+
+            return new()
+            {
+                IsAdmin = user.IsAdmin,   
+            };
+           
+        }
 
         public int TotalUsersCount => _userManager.Users.Count();
 

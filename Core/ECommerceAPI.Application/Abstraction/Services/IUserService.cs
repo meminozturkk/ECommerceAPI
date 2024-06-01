@@ -18,5 +18,6 @@ namespace ECommerceAPI.Application.Abstraction.Services
         Task AssignRoleToUserAsnyc(string userId, string[] roles);
         Task<string[]> GetRolesToUserAsync(string userIdOrName);
         Task<bool> HasRolePermissionToEndpointAsync(string name, string code);
+        Task<AppUser> GetByEMail(string email);
     }
 }

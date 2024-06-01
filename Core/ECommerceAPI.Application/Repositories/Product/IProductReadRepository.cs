@@ -9,5 +9,6 @@ namespace ECommerceAPI.Application.Repositories
 {
     public interface IProductReadRepository : IReadRepository<Product>
     {
+        IQueryable<Product> Table { get; }
     }
 }

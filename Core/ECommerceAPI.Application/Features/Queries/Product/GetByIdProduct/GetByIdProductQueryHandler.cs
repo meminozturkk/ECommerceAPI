@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Application.Repositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using P = ECommerceAPI.Domain.Entities;
 
 namespace ECommerceAPI.Application.Features.Queries.Product.GetByIdProduct
@@ -15,12 +16,20 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetByIdProduct
 
         public async Task<GetByIdProductQueryResponse> Handle(GetByIdProductQueryRequest request, CancellationToken cancellationToken)
         {
-            P.Product product = await _productReadRepository.GetByIdAsync(request.Id, false);
+           
+            P.Product product = await _productReadRepository.Table
+                .FirstOrDefaultAsync(p => p.Id.ToString() == request.Id, cancellationToken);
+            
             return new()
             {
+                
                 Name = product.Name,
                 Price = product.Price,
-                Stock = product.Stock
+                Stock = product.Stock,
+                ProductImageFile = product.ProductImageFile.Select(pif => new P.ProductImageFile
+                {
+                    Path = pif.Path,
+                }).ToList()
             };
         }
     }
